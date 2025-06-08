@@ -4,7 +4,8 @@ import { useState } from "react";
 export default function Home() {
   const [lines, setLines] = useState<string[]>([]);
   const [editable, setEditable] = useState<string[]>([]);
-  const [fileName, setFileName] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("track_day_1");
+  const [uploadedFilePath, setUploadedFilePath] = useState<string>("");
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -20,15 +21,19 @@ export default function Home() {
 
     const data = await res.json();
 
+    // Save path to reuse in download
+    setUploadedFilePath(data.originalFilePath || ""); // You need to make sure backend sends this
+
     const lineArr = data.content.split("\n");
 
-    const editCopy = [];
-    const permCopy = [];
+    const editCopy: string[] = [];
+    const permCopy: string[] = [];
 
     for (let i = 0; i < lineArr.length; i++) {
       const [editableVal, originalVal] = lineArr[i].split(',');
-      editCopy.push(editableVal ?? "");
-      permCopy.push(originalVal ?? "");
+      if (!editableVal || !originalVal) continue; // skip broken lines
+      editCopy.push(editableVal.trim());
+      permCopy.push(originalVal.trim());
     }
 
     setLines(permCopy);
@@ -41,25 +46,35 @@ export default function Home() {
     setEditable(updated);
   };
 
-
   const handleDownload = async () => {
+    if (!uploadedFilePath) {
+      alert("Original file path missing. Re-upload the file.");
+      return;
+    }
+
+    // Build key:value dictionary
+    const valueMap: { [key: string]: string } = {};
+    for (let i = 0; i < lines.length; i++) {
+      valueMap[lines[i]] = editable[i];
+    }
+
     const res = await fetch("https://odin-tuner-backend.onrender.com/api/download", {
       method: "POST",
-      body: "",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        originalFilePath: uploadedFilePath,
+        newData: valueMap
+      })
     });
 
     const data = await res.json();
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(data);
-    link.download = fileName.trim() + ".odni" || "new_data.odni";
-    link.click();
-  };
 
-  const downloadFile = () => {
-    const blob = new Blob([editable.join("\n")], { type: "text/plain" });
+    const blob = new Blob([data.content], { type: "text/plain" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = fileName.trim() + ".odni" || "new_data.odni";
+    link.download = `${fileName.trim() || "new_data"}.odni`;
     link.click();
   };
 
@@ -131,13 +146,12 @@ export default function Home() {
       {/* Download Button */}
       {editable.length > 0 && (
         <button
-          onClick={downloadFile}
+          onClick={handleDownload}
           className="mt-6 bg-blue-600 text-white py-2 px-5 rounded hover:bg-blue-700 transition"
         >
           Download Modified File
         </button>
       )}
     </main>
-
   );
 }
