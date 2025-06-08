@@ -4,6 +4,7 @@ import { useState } from "react";
 export default function Home() {
   const [lines, setLines] = useState<string[]>([]);
   const [editable, setEditable] = useState<string[]>([]);
+  const [fileName, setFileName] = useState<string>("modified_file.txt");
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -25,12 +26,13 @@ export default function Home() {
     const permCopy = [];
 
     for (let i = 0; i < lineArr.length; i++) {
-      editCopy.push(lineArr[i].split(',')[0]); // editable copy
-      permCopy.push(lineArr[i].split(',')[1]); // permanent copy
+      const [editableVal, originalVal] = lineArr[i].split(',');
+      editCopy.push(editableVal ?? "");
+      permCopy.push(originalVal ?? "");
     }
 
     setLines(permCopy);
-    setEditable(editCopy); // editable copy
+    setEditable(editCopy);
   };
 
   const handleEdit = (index: number, value: string) => {
@@ -43,7 +45,7 @@ export default function Home() {
     const blob = new Blob([editable.join("\n")], { type: "text/plain" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "modified_file.txt";
+    link.download = fileName.trim() || "modified_file.txt";
     link.click();
   };
 
@@ -52,6 +54,23 @@ export default function Home() {
       <h1 className="text-2xl font-bold mb-4">ODIN Tuner</h1>
 
       <input type="file" onChange={handleUpload} className="mb-4" />
+
+      {editable.length > 0 && (
+        <>
+          <div className="mb-4">
+            <label className="block mb-1 font-medium text-gray-700">
+              Output File Name:
+            </label>
+            <input
+              type="text"
+              value={fileName}
+              onChange={(e) => setFileName(e.target.value)}
+              className="w-full max-w-md border p-2 rounded"
+              placeholder="Enter filename e.g. tuned_file.csv"
+            />
+          </div>
+        </>
+      )}
 
       {lines.length > 0 && (
         <table className="w-full text-left border-collapse">
