@@ -41,6 +41,20 @@ export default function Home() {
     setEditable(updated);
   };
 
+
+  const handleDownload = async () => {
+    const res = await fetch("https://odin-tuner-backend.onrender.com/api/download", {
+      method: "POST",
+      body: "",
+    });
+
+    const data = await res.json();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(data);
+    link.download = fileName.trim() + ".odni" || "modified_file.txt";
+    link.click();
+  };
+
   const downloadFile = () => {
     const blob = new Blob([editable.join("\n")], { type: "text/plain" });
     const link = document.createElement("a");
