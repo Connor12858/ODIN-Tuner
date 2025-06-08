@@ -20,8 +20,17 @@ export default function Home() {
     const data = await res.json();
 
     const lineArr = data.content.split("\n");
-    setLines(lineArr);
-    setEditable([...lineArr]); // editable copy
+
+    const editCopy = [];
+    const permCopy = [];
+
+    for (let i = 0; i < lineArr.length; i++) {
+      editCopy.push(lineArr[i].split(',')[0]); // editable copy
+      permCopy.push(lineArr[i].split(',')[1]); // permanent copy
+    }
+
+    setLines(permCopy);
+    setEditable(editCopy); // editable copy
   };
 
   const handleEdit = (index: number, value: string) => {
