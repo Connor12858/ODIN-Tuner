@@ -4,7 +4,7 @@ import { useState } from "react";
 export default function Home() {
   const [lines, setLines] = useState<string[]>([]);
   const [editable, setEditable] = useState<string[]>([]);
-  const [fileName, setFileName] = useState<string>("modified_file.txt");
+  const [fileName, setFileName] = useState<string>("modified_file");
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,7 +45,7 @@ export default function Home() {
     const blob = new Blob([editable.join("\n")], { type: "text/plain" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = fileName.trim() || "modified_file.txt";
+    link.download = fileName.trim() + ".odni" || "modified_file.txt";
     link.click();
   };
 
@@ -82,7 +82,7 @@ export default function Home() {
             value={fileName}
             onChange={(e) => setFileName(e.target.value)}
             className="w-full max-w-md border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter filename e.g. tuned_map.csv"
+            placeholder="Enter filename e.g. track_day_1"
           />
         </div>
       )}
@@ -92,8 +92,8 @@ export default function Home() {
         <table className="w-full text-left border-collapse shadow-md rounded overflow-hidden">
           <thead>
             <tr className="bg-gray-800 text-white">
-              <th className="p-3 w-1/2">Original</th>
-              <th className="p-3 w-1/2">Editable</th>
+              <th className="p-3 w-1/2">Name</th>
+              <th className="p-3 w-1/2">Value</th>
             </tr>
           </thead>
           <tbody>
