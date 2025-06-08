@@ -4,7 +4,7 @@ import { useState } from "react";
 export default function Home() {
   const [lines, setLines] = useState<string[]>([]);
   const [editable, setEditable] = useState<string[]>([]);
-  const [fileName, setFileName] = useState<string>("modified_file");
+  const [fileName, setFileName] = useState<string>("");
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,7 +51,7 @@ export default function Home() {
     const data = await res.json();
     const link = document.createElement("a");
     link.href = URL.createObjectURL(data);
-    link.download = fileName.trim() + ".odni" || "modified_file.txt";
+    link.download = fileName.trim() + ".odni" || "new_data.odni";
     link.click();
   };
 
@@ -59,7 +59,7 @@ export default function Home() {
     const blob = new Blob([editable.join("\n")], { type: "text/plain" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = fileName.trim() + ".odni" || "modified_file.txt";
+    link.download = fileName.trim() + ".odni" || "new_data.odni";
     link.click();
   };
 
