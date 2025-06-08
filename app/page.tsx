@@ -60,11 +60,11 @@ export default function Home() {
           className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-400 p-6 text-center hover:border-blue-500 transition"
         >
           <p className="text-lg font-medium text-gray-700">Click or drag a file here to upload</p>
-          <p className="text-sm text-gray-500 mt-1">Only CSV files are supported</p>
+          <p className="text-sm text-gray-500 mt-1">Only ODNI files are supported</p>
           <input
             id="fileUpload"
             type="file"
-            accept=".csv"
+            accept=".odni"
             onChange={handleUpload}
             className="hidden"
           />
